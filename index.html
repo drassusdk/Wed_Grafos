@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editor de Grafos</title>
+  <link rel="icon" href="./Icono.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <h1 class="centered-heading">Grafos</h1>
+  <div class="container">
+    <div class="menu">
+
+      <h4>Doble click para agregar Nodo</h4>
+      
+      <h4>Editar Nodos</h4>
+      <label for="editNode">Seleccionar Nodo:</label>
+      <select id="editNode"></select><br><br>
+
+      <button onclick="changeNodeColor()">Cambiar Color</button><br> <br> 
+      <button onclick="deleteNode()">Borrar Nodo</button><br>
+
+      <h4>Agregar Aristas</h4>
+      <label for="startNode">Nodo Inicial:</label>
+      <select id="startNode"></select><br>
+      <label for="endNode">Nodo Final:</label>
+      <select id="endNode"></select><br>
+      <br>
+      <input type="number" id="edgeValue" placeholder="Valor"><br>
+      <button onclick="addEdge()">Agregar Arista</button><br>
+
+      <h4>Editar Aristas</h4>
+      <label for="changeEdge">Seleccionar Arista:</label>
+      <select id="editEdge"></select><br><br>
+      <input type="number" id="newValue" placeholder="Nuevo Valor"><br>
+      
+      <button onclick="changeEdgeValue()">Cambiar Valor</button><br><br>
+      <button onclick="deleteEdge()">Borrar Arista</button><br>
+      
+    </div>
+
+    <canvas id="canvas" width="800" height="600"></canvas>
+
+    <div class="menu2">
+      <h4>Abrir Proyecto</h4>
+      <button onclick="openProject()">Abrir</button><br>
+
+      <h4>Guardar Proyecto</h4>
+      <button onclick="saveProject()">Guardar</button><br>
+      <br>
+      <button onclick="saveImg()">Guardar Imagen</button><br>
+
+      <h4>Nuevo Proyecto</h4>
+      <button onclick="newProject()">Crear</button><br>
+
+    </div>
+
+  </div>
+
+</body>
+<script src="script.js"></script>
+
+</html>
