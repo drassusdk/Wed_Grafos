@@ -1,4 +1,4 @@
-const canvas = document.getElementById('canvas');  // creacion del lienzo usando cavas 
+const canvas = document.getElementById('canvas');  // manipulacion del lienzo
 const ctx = canvas.getContext('2d');              // se utiliza para realizar operaciones de dibujo
 
 let nodes = []; //arreglo de nodos
@@ -126,7 +126,7 @@ function drawEdge(startX, startY, endX, endY, value) {//8)dibujar aristas
   ctx.lineWidth = 2;
   ctx.stroke();
 
-  // Dibujar la arista
+  // Dibujar la flecha
   const arrowSize = 8;
   const angle = Math.atan2(endArrowY - startArrowY, endArrowX - startArrowX);
   const arrowStartX = endArrowX - Math.cos(angle) * arrowSize;
@@ -299,11 +299,16 @@ function saveImg() {//15)  Guardar como imagen
 
 function openProject() {//16) abrir proyecto desde archivo JSON
   const input = document.createElement('input');
+
   input.type = 'file';
   input.accept = 'application/json';
+  input.click();
+
   input.onchange = function (event) {
     const file = event.target.files[0];
     const reader = new FileReader();
+    reader.readAsText(file);
+
     reader.onload = function (event) {
       const data = JSON.parse(event.target.result);
       nodes = data.nodes;
@@ -321,7 +326,7 @@ function openProject() {//16) abrir proyecto desde archivo JSON
       drawNodes();
       updateSelects();
     };
-    reader.readAsText(file);
+    
   };
-  input.click();
+  
 }
