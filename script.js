@@ -2,12 +2,15 @@ const canvas = document.getElementById('canvas');  // manipulacion del lienzo
 const ctx = canvas.getContext('2d');              // se utiliza para realizar operaciones de dibujo
 
 let nodes = []; //arreglo de nodos
-let nodesF = []; //arreglo de nodos
 let edges = [];//arreglo de aristas
 let nodeCounter = 1;//contador de nodos
 
-let lost = [];                      //arreglo para guardar nombres de nodos 
-let cEracer = 0; let cRename = 0; let save=1;//contadores extras
+let lost = []; //arreglo para guardar nombres de nodos 
+let cEracer = 0; let cRename = 0; let save = 1;//contadores extras
+
+// Variable para rastrear si se está arrastrando
+let draggingNode = null;
+let offsetX, offsetY;
 
 
 canvas.addEventListener('dblclick', function (event) {//1) tomar las cordenadas x y y para los nodos
@@ -18,32 +21,33 @@ canvas.addEventListener('dblclick', function (event) {//1) tomar las cordenadas 
 });
 
 function addNode(x, y) {//2) agregar nodo
-  const node = { name: nodeCounter, x: x, y: y, color: '#ffcc00' };
+  const node = { name: nodeCounter, x: x, y: y, color: '#ffcc00', type: "normal" };
 
 
 
-  if (nodesF.length <= 1) {
+  if (nodes.length <= 1) {
 
-    node.name = "f";
+
+    if (nodes.length === 0) { node.name = "I"; node.type = "Origen" }
+    else { node.name = "F"; node.type = "Final" }
+
     node.color = '#1900ff';
     nodeCounter--;
-    nodesF.push(node);
+
   } else {
+    const x = nodes[1].x;
+    const y = nodes[1].y;
 
-    const x = nodesF[1].x;
-    const y = nodesF[1].y;
-
-    nodesF[1].x = node.x;
-    nodesF[1].y = node.y;
+    nodes[1].x = node.x;
+    nodes[1].y = node.y;
 
     node.x = x;
     node.y = y;
 
-    nodes.push(node);
     drawNodes()
 
   }
-
+  nodes.push(node);
 
 
   if (cEracer > 0 && cRename < cEracer) {//heredado de nombres
@@ -61,9 +65,6 @@ function addNode(x, y) {//2) agregar nodo
 function drawNodes() {//3) redibujar todos los nodos
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   for (const node of nodes) {
-    drawNode(node, node.color);
-  }
-  for (const node of nodesF) {
     drawNode(node, node.color);
   }
   drawEdges();
@@ -98,7 +99,7 @@ function deleteNode() {//5) borrar nodos y sus aristas
   lost.sort(function (a, b) { return a - b; });
 }
 
-function changeNodeColor() {//6) cambiar color de nodos
+function changeNodeColor() {//NO SIRVE       6) cambiar color de nodos
   save = 0
   const selectNodeValue = parseInt(document.getElementById('editNode').value);
   const selectedNode = nodes.find(node => node.name === selectNodeValue);
@@ -110,9 +111,9 @@ function changeNodeColor() {//6) cambiar color de nodos
 }
 
 function addEdge() {//7) agregar aristas
-  const startNodeValue = document.getElementById('startNode').value;
+  const startNodeValue = document.getElementById('startNode').value
   const endNodeValue = document.getElementById('endNode').value;
-  let edgeValue = parseInt(document.getElementById('edgeValue').value);
+  const edgeValue = parseInt(document.getElementById('edgeValue').value);
 
   if (isNaN(edgeValue) || edgeValue === 0) {
     const confirmed = confirm('No se ha establecido un valor válido para la arista.');
@@ -120,13 +121,20 @@ function addEdge() {//7) agregar aristas
 
     }
   } else {
-    const startNodeIndex = parseInt(startNodeValue);
-    const endNodeIndex = parseInt(endNodeValue);
+    let startNodeIndex = parseInt(startNodeValue);
+    if (!startNodeIndex) { startNodeIndex = startNodeValue }
+
+    let endNodeIndex = parseInt(endNodeValue);
+    if (!endNodeIndex) { endNodeIndex = endNodeValue }
 
     edges.push({ start: startNodeIndex, end: endNodeIndex, value: edgeValue });
 
-    const startNode = nodes.find(node => node.name === startNodeIndex);
-    const endNode = nodes.find(node => node.name === endNodeIndex);
+
+    let startNode = nodes.find(node => node.name === startNodeIndex);
+    let endNode = nodes.find(node => node.name === endNodeIndex);
+   
+
+
 
     drawEdge(startNode.x, startNode.y, endNode.x, endNode.y, edgeValue);
     updateSelects();
@@ -234,6 +242,8 @@ function updateSelects() {//12) actualizacion de los datos de los select
   editEdgeSelect.innerHTML = '';
 
   // Agregar nodos al select
+
+ 
   for (const node of nodes) {
     const option = document.createElement('option');
     option.value = node.name;
@@ -283,7 +293,7 @@ function newProject() {//13) borrar todo
     cEracer = 0; cRename = 0; save = 0;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
-  save=1
+  save = 1
 }
 
 function saveProject() {//14)  Guardar el proyecto
