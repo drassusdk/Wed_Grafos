@@ -2,6 +2,7 @@ const canvas = document.getElementById('canvas');  // manipulacion del lienzo
 const ctx = canvas.getContext('2d');              // se utiliza para realizar operaciones de dibujo
 
 let nodes = []; //arreglo de nodos
+let nodesF = []; //arreglo de nodos
 let edges = [];//arreglo de aristas
 let nodeCounter = 1;//contador de nodos
 
@@ -18,7 +19,32 @@ canvas.addEventListener('dblclick', function (event) {//1) tomar las cordenadas 
 
 function addNode(x, y) {//2) agregar nodo
   const node = { name: nodeCounter, x: x, y: y, color: '#ffcc00' };
-  nodes.push(node);
+
+
+
+  if (nodesF.length <= 1) {
+
+    node.name = "f";
+    node.color = '#1900ff';
+    nodeCounter--;
+    nodesF.push(node);
+  } else {
+
+    const x = nodesF[1].x;
+    const y = nodesF[1].y;
+
+    nodesF[1].x = node.x;
+    nodesF[1].y = node.y;
+
+    node.x = x;
+    node.y = y;
+
+    nodes.push(node);
+    drawNodes()
+
+  }
+
+
 
   if (cEracer > 0 && cRename < cEracer) {//heredado de nombres
     node.name = lost[cRename];
@@ -35,6 +61,9 @@ function addNode(x, y) {//2) agregar nodo
 function drawNodes() {//3) redibujar todos los nodos
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   for (const node of nodes) {
+    drawNode(node, node.color);
+  }
+  for (const node of nodesF) {
     drawNode(node, node.color);
   }
   drawEdges();
@@ -88,7 +117,7 @@ function addEdge() {//7) agregar aristas
   if (isNaN(edgeValue) || edgeValue === 0) {
     const confirmed = confirm('No se ha establecido un valor válido para la arista.');
     if (confirmed) {
-      
+
     }
   } else {
     const startNodeIndex = parseInt(startNodeValue);
@@ -326,7 +355,7 @@ function openProject() {//16) abrir proyecto desde archivo JSON
       drawNodes();
       updateSelects();
     };
-    
+
   };
-  
+
 }
