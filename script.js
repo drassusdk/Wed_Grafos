@@ -99,17 +99,6 @@ function deleteNode() {//5) borrar nodos y sus aristas
   lost.sort(function (a, b) { return a - b; });
 }
 
-function changeNodeColor() {//NO SIRVE       6) cambiar color de nodos
-  save = 0
-  const selectNodeValue = parseInt(document.getElementById('editNode').value);
-  const selectedNode = nodes.find(node => node.name === selectNodeValue);
-  if (selectedNode) {
-    selectedNode.color = (selectedNode.color === '#ffcc00') ? '#3500f7' : '#ffcc00';
-    drawNodes();
-  }
-
-}
-
 function addEdge() {//7) agregar aristas
   const startNodeValue = document.getElementById('startNode').value
   const endNodeValue = document.getElementById('endNode').value;
@@ -369,3 +358,47 @@ function openProject() {//16) abrir proyecto desde archivo JSON
   };
 
 }
+
+
+//Funciones para moviemiento de los nodos
+function startDraggingNode(node, x, y) {
+  draggingNode = node;
+  offsetX = x - node.x;
+  offsetY = y - node.y;
+}
+
+function stopDraggingNode() {
+  draggingNode = null;
+}
+
+canvas.addEventListener('mousedown', function (event) {
+  const rect = canvas.getBoundingClientRect();
+  const mouseX = event.clientX - rect.left;
+  const mouseY = event.clientY - rect.top;
+
+  for (const node of nodes) {
+    const distance = Math.sqrt((mouseX - node.x) ** 2 + (mouseY - node.y) ** 2);
+    if (distance <= 18) {
+      startDraggingNode(node, mouseX, mouseY);
+      break;
+    }
+  }
+});
+
+canvas.addEventListener('mousemove', function (event) {
+  if (draggingNode) {
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = event.clientX - rect.left;
+    const mouseY = event.clientY - rect.top;
+
+    draggingNode.x = mouseX - offsetX;
+    draggingNode.y = mouseY - offsetY;
+
+    drawNodes();
+  }
+});
+
+canvas.addEventListener('mouseup', function () {
+  stopDraggingNode();
+});
+
