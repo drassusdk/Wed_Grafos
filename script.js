@@ -28,7 +28,7 @@ function addNode(x, y) {//2) agregar nodo
   if (nodes.length <= 1) {
 
 
-    if (nodes.length === 0) { node.name = "I"; node.type = "Origen" }
+    if (nodes.length === 0) { node.name = "I"; node.type = "Inicial" }
     else { node.name = "F"; node.type = "Final" }
 
     node.color = '#1900ff';
@@ -116,7 +116,9 @@ function addEdge() {//7) agregar aristas
     let endNodeIndex = parseInt(endNodeValue);
     if (!endNodeIndex) { endNodeIndex = endNodeValue }
 
-    edges.push({ start: startNodeIndex, end: endNodeIndex, value: edgeValue });
+    const edge={ start: startNodeIndex, end: endNodeIndex, value: edgeValue, color:'#000000' }
+
+    edges.push(edge);
 
 
     let startNode = nodes.find(node => node.name === startNodeIndex);
@@ -125,12 +127,12 @@ function addEdge() {//7) agregar aristas
 
 
 
-    drawEdge(startNode.x, startNode.y, endNode.x, endNode.y, edgeValue);
+    drawEdge(startNode.x, startNode.y, endNode.x, endNode.y, edgeValue,edge.color);
     updateSelects();
   }
 }
 
-function drawEdge(startX, startY, endX, endY, value) {//8)dibujar aristas 
+function drawEdge(startX, startY, endX, endY, value, color) {//8)dibujar aristas 
   const startRadius = 18;
   const endRadius = 18;
 
@@ -148,7 +150,7 @@ function drawEdge(startX, startY, endX, endY, value) {//8)dibujar aristas
   ctx.beginPath();
   ctx.moveTo(startArrowX, startArrowY);
   ctx.lineTo(endArrowX, endArrowY);
-  ctx.strokeStyle = '#000000';
+  ctx.strokeStyle = color;
   ctx.lineWidth = 2;
   ctx.stroke();
 
@@ -169,7 +171,7 @@ function drawEdge(startX, startY, endX, endY, value) {//8)dibujar aristas
     arrowStartX - Math.cos(angle + Math.PI / 6) * arrowSize,
     arrowStartY - Math.sin(angle + Math.PI / 6) * arrowSize
   );
-  ctx.strokeStyle = '#000000';
+  ctx.strokeStyle = color;
   ctx.lineWidth = 2;
   ctx.stroke();
 
@@ -194,7 +196,7 @@ function drawEdges() {//9) redibujara aristas
   for (const edge of edges) {
     const startNode = nodes.find(node => node.name === edge.start);
     const endNode = nodes.find(node => node.name === edge.end);
-    drawEdge(startNode.x, startNode.y, endNode.x, endNode.y, edge.value);
+    drawEdge(startNode.x, startNode.y, endNode.x, endNode.y, edge.value, edge.color);
   }
 }
 
@@ -401,4 +403,112 @@ canvas.addEventListener('mousemove', function (event) {
 canvas.addEventListener('mouseup', function () {
   stopDraggingNode();
 });
+
+
+
+//algotimo de distrak
+function dijkstra(startNodeName) {
+  const distances = {};
+  const visited = {};
+  const queue = [];
+
+  // Inicializar las distancias y la cola de prioridad
+  for (const node of nodes) {
+    distances[node.name] = Infinity;
+    visited[node.name] = false;
+    queue.push(node.name);
+  }
+
+  distances[startNodeName] = 0;
+
+  while (queue.length > 0) {
+    // Ordenar la cola por distancia
+    queue.sort((a, b) => distances[a] - distances[b]);
+
+    const currentNodeName = queue.shift();
+    const currentNode = nodes.find(node => node.name === currentNodeName);
+
+    // Marcar el nodo como visitado
+    visited[currentNodeName] = true;
+
+    for (const edge of edges) {
+      if (edge.start === currentNodeName && !visited[edge.end]) {
+        const newDistance = distances[currentNodeName] + edge.value;
+
+        if (newDistance < distances[edge.end]) {
+          distances[edge.end] = newDistance;
+        }
+      }
+    }
+  }
+
+  return distances;
+}
+
+function findNodeByType(type) {// Función para encontrar el nodo según su tipo
+  return nodes.find(node => node.type === type);
+}
+
+function findShortestPath() {// Función para encontrar el camino más corto entre el nodo inicial y final
+  const startNode = findNodeByType("Inicial");
+  const endNode = findNodeByType("Final");
+
+  console.log("name:" +startNode)
+
+  // Función dijkstra implementada anteriormente
+  const distances = dijkstra(startNode.name);
+
+  // Reconstruir el camino más corto
+  let currentNode = endNode;
+  const shortestPath = [currentNode];
+
+  while (currentNode.name !== startNode.name) {
+    const incomingEdge = edges.find(edge => edge.end === currentNode.name && distances[edge.start] === distances[currentNode.name] - edge.value);
+    const previousNode = nodes.find(node => node.name === incomingEdge.start);
+    shortestPath.unshift(previousNode);
+    currentNode = previousNode;
+  }
+
+  return shortestPath;
+}
+
+function Dijkstraboton(){// Uso de la función 
+
+const camino = findShortestPath();
+console.log("Camino más corto:", camino);
+
+for(let x=0;x<nodes.length;x++){//cambio de color de los nodos
+  let controlador=false;
+
+  for(let y=0;y<camino.length;y++){
+
+    if(nodes[x]===camino[y]){controlador=true}
+
+  }
+
+  if(controlador===false){nodes[x].color='#676769'}
+
+}
+
+for(let x=0;x<edges.length;x++){//cambio de color de los aristas
+  
+
+  for(let y=0;y<camino.length;y++){
+
+    if(edges[x].start===camino[y].name && edges[x].end===camino[y+1].name ){
+      
+      edges[x].color='#00ff00'
+    }
+
+  }
+
+  
+
+}
+
+
+
+drawNodes();
+
+}
 
