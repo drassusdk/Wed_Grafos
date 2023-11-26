@@ -493,7 +493,13 @@ function Dijkstraboton() {// Uso de la función
 
     for (let y = 0; y < camino.length; y++) {
 
-      if (nodes[x] === camino[y]) { controlador = true }
+      if (nodes[x] === camino[y]) { controlador = true; 
+        
+        if(nodes[x].type!="Inicial" && nodes[x].type!="Final"){
+          nodes[x].color='#ffcc00'}
+        }
+        
+        
 
     }
 
@@ -508,12 +514,16 @@ function Dijkstraboton() {// Uso de la función
 
       if (edges[x].start === camino[y].name && edges[x].end === camino[y + 1].name) {
 
-        edges[x].color = '#00ff00'
+        edges[x].color = '#111111'
       }
 
     }
 
+    if(edges[x].color === '#111111'){edges[x].color ='#000000'}
+    else{edges[x].color ='#a1a1a3'}
+
   }
+
 
   drawNodes();
   time(endTime - startTime);
@@ -525,12 +535,12 @@ function time(duration) {
   console.log("Duracion: " + duration + ' milisegundos');
 
 
-  const frase = "Duracion: " + duration.toExponential(2) + ' milisegundos';
+  const frase = "Duracion: 0h 0m  " + duration.toFixed(2)/1000+ 's';
   ctx.font = '15px Arial';
   ctx.fillStyle = 'black';
 
   // Dibujar la frase en el canvas
-  ctx.fillText(frase, 650, 580);
+  ctx.fillText(frase, 700, 30);
 
   startTime = 0;
   endTime = 0;
