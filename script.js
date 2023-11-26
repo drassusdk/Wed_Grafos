@@ -481,7 +481,6 @@ function findShortestPath() {// Función para encontrar el camino más corto ent
   return shortestPath;
 }
 
-
 function Dijkstraboton() {// Uso de la función 
 
 
@@ -520,7 +519,6 @@ function Dijkstraboton() {// Uso de la función
   time(endTime - startTime);
 
 }
-
 
 function time(duration) {
 
