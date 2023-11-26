@@ -410,8 +410,8 @@ canvas.addEventListener('mouseup', function () {
 
 
 
-//algotimo de distrak
-function dijkstra(startNodeName) {
+
+function dijkstra(startNodeName) {//algotimo de distrak
   const distances = {};
   const visited = {};
   const queue = [];
@@ -449,7 +449,7 @@ function dijkstra(startNodeName) {
   return distances;
 }
 
-function findNodeByType(type) {// Función para encontrar el nodo según su tipo
+function VerificarType(type) {// Función para encontrar el nodo según su tipo
   return nodes.find(node => node.type === type);
 }
 
@@ -457,8 +457,8 @@ function findShortestPath() {// Función para encontrar el camino más corto ent
 
   startTime = performance.now();//inicio del cronometro
 
-  const startNode = findNodeByType("Inicial");
-  const endNode = findNodeByType("Final");
+  const startNode = VerificarType("Inicial");
+  const endNode = VerificarType("Final");
 
   // Función dijkstra implementada anteriormente
   const distances = dijkstra(startNode.name);
@@ -481,7 +481,7 @@ function findShortestPath() {// Función para encontrar el camino más corto ent
   return shortestPath;
 }
 
-function Dijkstraboton() {// Uso de la función 
+function Ejecucion() {// Uso de la función 
 
 
 
@@ -530,7 +530,7 @@ function Dijkstraboton() {// Uso de la función
 
 }
 
-function time(duration) {
+function time(duration) {//imprecion del tiempo de ejecucion
 
   console.log("Duracion: " + duration + ' milisegundos');
 
