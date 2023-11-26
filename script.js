@@ -12,6 +12,10 @@ let cEracer = 0; let cRename = 0; let save = 1;//contadores extras
 let draggingNode = null;
 let offsetX, offsetY;
 
+// variables para cronometro
+let startTime;
+let endTime;
+
 
 canvas.addEventListener('dblclick', function (event) {//1) tomar las cordenadas x y y para los nodos
   const rect = canvas.getBoundingClientRect();
@@ -116,18 +120,18 @@ function addEdge() {//7) agregar aristas
     let endNodeIndex = parseInt(endNodeValue);
     if (!endNodeIndex) { endNodeIndex = endNodeValue }
 
-    const edge={ start: startNodeIndex, end: endNodeIndex, value: edgeValue, color:'#000000' }
+    const edge = { start: startNodeIndex, end: endNodeIndex, value: edgeValue, color: '#000000' }
 
     edges.push(edge);
 
 
     let startNode = nodes.find(node => node.name === startNodeIndex);
     let endNode = nodes.find(node => node.name === endNodeIndex);
-   
 
 
 
-    drawEdge(startNode.x, startNode.y, endNode.x, endNode.y, edgeValue,edge.color);
+
+    drawEdge(startNode.x, startNode.y, endNode.x, endNode.y, edgeValue, edge.color);
     updateSelects();
   }
 }
@@ -234,7 +238,7 @@ function updateSelects() {//12) actualizacion de los datos de los select
 
   // Agregar nodos al select
 
- 
+
   for (const node of nodes) {
     const option = document.createElement('option');
     option.value = node.name;
@@ -450,10 +454,11 @@ function findNodeByType(type) {// Función para encontrar el nodo según su tipo
 }
 
 function findShortestPath() {// Función para encontrar el camino más corto entre el nodo inicial y final
+
+  startTime = performance.now();//inicio del cronometro
+
   const startNode = findNodeByType("Inicial");
   const endNode = findNodeByType("Final");
-
-  console.log("name:" +startNode)
 
   // Función dijkstra implementada anteriormente
   const distances = dijkstra(startNode.name);
@@ -469,46 +474,71 @@ function findShortestPath() {// Función para encontrar el camino más corto ent
     currentNode = previousNode;
   }
 
+  endTime = performance.now();//final del cronometro
+
+
+
   return shortestPath;
 }
 
-function Dijkstraboton(){// Uso de la función 
 
-const camino = findShortestPath();
-console.log("Camino más corto:", camino);
+function Dijkstraboton() {// Uso de la función 
 
-for(let x=0;x<nodes.length;x++){//cambio de color de los nodos
-  let controlador=false;
 
-  for(let y=0;y<camino.length;y++){
 
-    if(nodes[x]===camino[y]){controlador=true}
+  const camino = findShortestPath();
+  console.log("Camino más corto:", camino);
+
+  for (let x = 0; x < nodes.length; x++) {//cambio de color de los nodos
+    let controlador = false;
+
+    for (let y = 0; y < camino.length; y++) {
+
+      if (nodes[x] === camino[y]) { controlador = true }
+
+    }
+
+    if (controlador === false) { nodes[x].color = '#676769' }
 
   }
 
-  if(controlador===false){nodes[x].color='#676769'}
+  for (let x = 0; x < edges.length; x++) {//cambio de color de los aristas
 
-}
 
-for(let x=0;x<edges.length;x++){//cambio de color de los aristas
-  
+    for (let y = 0; y < camino.length; y++) {
 
-  for(let y=0;y<camino.length;y++){
+      if (edges[x].start === camino[y].name && edges[x].end === camino[y + 1].name) {
 
-    if(edges[x].start===camino[y].name && edges[x].end===camino[y+1].name ){
-      
-      edges[x].color='#00ff00'
+        edges[x].color = '#00ff00'
+      }
+
     }
 
   }
 
-  
+  drawNodes();
+  time(endTime - startTime);
 
 }
 
 
+function time(duration) {
 
-drawNodes();
+  console.log("Duracion: " + duration + ' milisegundos');
+
+
+  const frase = "Duracion: " + duration.toExponential(2) + ' milisegundos';
+  ctx.font = '15px Arial';
+  ctx.fillStyle = 'black';
+
+  // Dibujar la frase en el canvas
+  ctx.fillText(frase, 650, 580);
+
+  startTime = 0;
+  endTime = 0;
+
 
 }
+
+
 
