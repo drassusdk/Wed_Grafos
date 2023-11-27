@@ -17,6 +17,8 @@ let startTime;
 let endTime;
 
 
+const graph = {};//representar la estructura del grafo
+
 canvas.addEventListener('dblclick', function (event) {//1) tomar las cordenadas x y y para los nodos
   const rect = canvas.getBoundingClientRect();
   const x = event.clientX - rect.left;
@@ -365,19 +367,19 @@ function openProject() {//16) abrir proyecto desde archivo JSON
 
 }
 
+//___________________________________________________________________________________________________________________________________
 
-//Funciones para moviemiento de los nodos
-function startDraggingNode(node, x, y) {
+function startDraggingNode(node, x, y) {//Ajusta el nodo que se está arrastrando y calcula las diferencias de posición
   draggingNode = node;
   offsetX = x - node.x;
   offsetY = y - node.y;
 }
 
-function stopDraggingNode() {
+function stopDraggingNode() {//Detiene el arrastre de un nodo
   draggingNode = null;
 }
 
-canvas.addEventListener('mousedown', function (event) {
+canvas.addEventListener('mousedown', function (event) {//evento que Inicia el arrastre de un nodo
   const rect = canvas.getBoundingClientRect();
   const mouseX = event.clientX - rect.left;
   const mouseY = event.clientY - rect.top;
@@ -391,7 +393,7 @@ canvas.addEventListener('mousedown', function (event) {
   }
 });
 
-canvas.addEventListener('mousemove', function (event) {
+canvas.addEventListener('mousemove', function (event) {//evento que escucha el arrastre y va Actualiza la posicion del nodo
   if (draggingNode) {
     const rect = canvas.getBoundingClientRect();
     const mouseX = event.clientX - rect.left;
@@ -404,12 +406,11 @@ canvas.addEventListener('mousemove', function (event) {
   }
 });
 
-canvas.addEventListener('mouseup', function () {
+canvas.addEventListener('mouseup', function () {//evento que escucha donde se finaliza el arrastre
   stopDraggingNode();
 });
 
-
-
+//___________________________________________________________________________________________________________________________________
 
 function dijkstra(startNodeName) {//algotimo de distrak
   const distances = {};
@@ -493,14 +494,13 @@ function Ejecucion() {// Uso de la función
 
     for (let y = 0; y < camino.length; y++) {
 
-      if (nodes[x] === camino[y]) { controlador = true; 
-        
-        if(nodes[x].type!="Inicial" && nodes[x].type!="Final"){
-          nodes[x].color='#ffcc00'}
-        }
-        
-        
+      if (nodes[x] === camino[y]) {
+        controlador = true;
 
+        if (nodes[x].type != "Inicial" && nodes[x].type != "Final") {
+          nodes[x].color = '#ffcc00'
+        }
+      }
     }
 
     if (controlador === false) { nodes[x].color = '#676769' }
@@ -516,37 +516,131 @@ function Ejecucion() {// Uso de la función
 
         edges[x].color = '#111111'
       }
-
     }
 
-    if(edges[x].color === '#111111'){edges[x].color ='#000000'}
-    else{edges[x].color ='#a1a1a3'}
+    if (edges[x].color === '#111111') { edges[x].color = '#000000' }
+    else { edges[x].color = '#a1a1a3' }
 
   }
 
 
-  drawNodes();
+  
   time(endTime - startTime);
+
+}
+
+//_______________________________________________________________________________________________________________________________
+
+function fordFulkerson(graph, Inicio, Final) {// Implementación del algoritmo de Ford-Fulkerson
+
+  startTime = performance.now();//inicio del cronometro
+
+  let flujoMaximo = 0;
+
+  function encontrarFlujo(grafico, Inicio, Final, padre) {
+    const visitados = new Set();
+
+    const dfs = (actual) => {
+      visitados.add(actual);
+
+      for (const vecino in grafico[actual]) {
+        if (!visitados.has(vecino) && grafico[actual][vecino] > 0) {
+          padre[vecino] = actual;
+
+          if (vecino === Final) {
+            return true;  // Se encontró un camino aumentante
+          }
+
+          if (dfs(vecino)) {
+            return true;
+          }
+        }
+      }
+
+      return false;
+    };
+
+    return dfs(Inicio);
+  }
+
+  let padre = {};
+  Object.keys(graph).forEach((nodo) => {
+    padre[nodo] = null;
+  });
+
+
+  while (encontrarFlujo(graph, Inicio, Final, padre)) {
+    let flujoCamino = Infinity;
+
+
+    for (let v = Final; v !== Inicio; v = padre[v]) {
+      const u = padre[v];
+      flujoCamino = Math.min(flujoCamino, graph[u][v]);
+    }
+
+
+    for (let v = Final; v !== Inicio; v = padre[v]) {
+      const u = padre[v];
+      graph[u][v] -= flujoCamino;
+      graph[v][u] += flujoCamino;
+    }
+
+
+    flujoMaximo += flujoCamino;
+
+    Object.keys(padre).forEach((nodo) => {
+      padre[nodo] = null;
+    });
+  }
+
+  endTime = performance.now();//final del cronometro
+
+  return flujoMaximo;
+}
+
+function EjecucionFulkerson() {// Uso de la función fordFulkerson
+
+  const sourceNode = 'I';
+  const sinkNode = 'F';
+
+  nodes.forEach((node) => {
+    graph[node.name] = {};
+  });
+  edges.forEach((edge) => {
+    const { start, end, value } = edge;
+    graph[start][end] = value;
+    graph[end][start] = value;
+  });
+
+  const maxFlow = fordFulkerson(graph, sourceNode, sinkNode);
+  console.log("Flujo Máximo:", maxFlow);
+
+  time(endTime - startTime);
+
+  const frase = "Flujo Maximo: " + maxFlow;
+  ctx.font = '15px Arial';
+  ctx.fillStyle = 'black';
+
+  ctx.fillText(frase, 700, 580);
+
 
 }
 
 function time(duration) {//imprecion del tiempo de ejecucion
 
+  drawNodes();
   console.log("Duracion: " + duration + ' milisegundos');
 
 
-  const frase = "Duracion: 0h 0m  " + duration.toFixed(2)/1000+ 's';
+  const frase = "Tiempo de Ejecucion: 0h 0m  " + duration.toFixed(2) / 1000 + 's';
   ctx.font = '15px Arial';
   ctx.fillStyle = 'black';
 
-  // Dibujar la frase en el canvas
-  ctx.fillText(frase, 700, 30);
+  ctx.fillText(frase, 650, 30);
+
 
   startTime = 0;
   endTime = 0;
 
 
 }
-
-
-
