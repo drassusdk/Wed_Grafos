@@ -5,60 +5,140 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Editor de Grafos</title>
-  <link rel="icon" href="./Icono.png">
+  <link rel="icon" href="img/Icono.png">
   <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
   <h1 class="centered-heading">Grafos</h1>
   <div class="container">
-    <div class="menu">
+    
+    
+    <nav class="nav">
 
-      <h4>Doble click para agregar Nodo</h4>
-      
-      <h4>Editar Nodos</h4>
-      <label for="editNode">Seleccionar Nodo:</label>
-      <select id="editNode"></select><br><br>
+      <ul class="list">
+       
 
-      <button onclick="deleteNode()">Borrar Nodo</button><br>
+          <li class="list__item list__item--click">
 
-      <h4>Agregar Aristas</h4>
-      <label for="startNode">Nodo Inicial:</label>
-      <select id="startNode"></select><br>
-      <label for="endNode">Nodo Final:</label>
-      <select id="endNode"></select><br>
-      <br>
-      <input type="number" id="edgeValue" placeholder="Valor"><br>
-      <button onclick="addEdge()">Agregar Arista</button><br>
+              <div class="list__button list__button--click">
 
-      <h4>Editar Aristas</h4>
-      <label for="changeEdge">Seleccionar Arista:</label>
-      <select id="editEdge"></select><br><br>
-      <input type="number" id="newValue" placeholder="Nuevo Valor"><br>
-      
-      <button onclick="changeEdgeValue()">Cambiar Valor</button><br><br>
-      <button onclick="deleteEdge()">Borrar Arista</button><br>
+                  <img src="img/save.svg" class="list__img">
+                  <a href="#" class="nav__link">Archivo</a>
+                  <img src="img/flecha.svg" class="list__arrow">
 
-      <button onclick="Ejecucion()">Dijkstra</button><br>
-      <button onclick="EjecucionFulkerson()">Fulkerson</button><br>
-      
-    </div>
+              </div>
+              <ul class="list_show">
+                  <li class="list__inside">
+                      <a href="#" class="nav__link nav__link--inside Abrir">Abrir</a>
+                  </li>
+                  <li class="list__inside">
+                      <a href="#" class="nav__link nav__link--inside GuardarA">Guardar archivo</a>
+                  </li>
+                  <li class="list__inside">
+                      <a href="#" class="nav__link nav__link--inside GuardarImg">Guardar Imagen</a>
+                  </li>
+                  <li class="list__inside">
+                      <a href="#" class="nav__link nav__link--inside New">Nuevo</a>
+                  </li>
+                  
+              </ul>
+          </li><br>
 
-    <canvas id="canvas" width="800" height="600"></canvas>
+          <li class="list__item list__item--click">
 
-    <div class="menu2">
-      <h4>Abrir Proyecto</h4>
-      <button onclick="openProject()">Abrir</button><br>
+              <div class="list__button list__button--click">
 
-      <h4>Guardar Proyecto</h4>
-      <button onclick="saveProject()">Guardar</button><br>
-      <br>
-      <button onclick="saveImg()">Guardar Imagen</button><br>
+                  <img src="img/node.svg" class="list__img">
+                  <a href="#" class="nav__link">Nodos</a>
+                  <img src="img/flecha.svg" class="list__arrow">
 
-      <h4>Nuevo Proyecto</h4>
-      <button onclick="newProject()">Crear</button><br>
+              </div>
+              <ul class="list_show">
 
-    </div>
+                  <li class="list__insides">
+
+                      <a href="#" class="nav__link nav__link--inside2">
+                          <label for="editNode">Seleccionar Nodo:</label>
+                          <select id="editNode"></select>
+                      </a>
+                  </li>
+                  <li class="list__inside">
+                      <a href="#" class="nav__link nav__link--inside Borrar">Borrar</a>
+                  </li>
+                  <li class="list__inside">
+                      <a href="#" class="nav__link nav__link--inside Agregar">Agregar</a>
+                  </li>
+              </ul>
+          </li><br>
+
+          <li class="list__item list__item--click">
+
+              <div class="list__button list__button--click">
+
+                  <img src="img/edege.svg" class="list__img">
+                  <a href="#" class="nav__link">Aristas</a>
+                  <img src="img/flecha.svg" class="list__arrow">
+
+              </div>
+              <ul class="list_show">
+                  <li class="list__inside">
+                      <a href="#" class="nav__link nav__link--inside2">
+                          <label for="startNode">Nodo Inicial:</label>
+                          <select id="startNode"></select><br>
+                          <label for="endNode">Nodo Final:_ </label>
+                          <select id="endNode"></select><br><br>
+
+                          <input type="number" id="edgeValue" placeholder="Valor"><br>
+
+                      </a>
+                  </li>
+                  <li class="list__inside">
+                      <a href="#" class="nav__link nav__link--inside AgregarArista">Agregar</a>
+                  </li>
+                  <li class="list__inside">
+                      <a href="#" class="nav__link nav__link--inside2">
+                          <label for="changeEdge">Seleccionar Arista:</label>
+                          <select id="editEdge"></select><br><br>
+                          <input type="number" id="newValue" placeholder="Nuevo Valor"><br>
+                      </a>
+                  </li>
+                  <li class="list__inside">
+                      <a href="#" class="nav__link nav__link--inside CambiarValor">Cambiar</a>
+                  </li>
+                  <li class="list__inside">
+                      <a href="#" class="nav__link nav__link--inside EliminarArista">Eliminar</a>
+                  </li>
+
+              </ul>
+          </li><br>
+
+          <li class="list__item list__item--click">
+
+              <div class="list__button list__button--click">
+
+                  <img src="img/tareas.svg" class="list__img">
+                  <a href="#" class="nav__link">Operaciones</a>
+                  <img src="img/flecha.svg" class="list__arrow">
+
+              </div>
+              <ul class="list_show">
+                  <li class="list__inside">
+                      <a href="#" class="nav__link nav__link--inside Dijkstra">Camino mas corto</a>
+                  </li>
+                  <li class="list__inside">
+                      <a href="#" class="nav__link nav__link--inside Fulkerson">Flujo maximo</a>
+                  </li>
+              </ul>
+          </li><br>
+
+      </ul>
+  </nav>
+
+
+    <canvas id="canvas" width="1000" height="600"></canvas>
+
+    
 
   </div>
 

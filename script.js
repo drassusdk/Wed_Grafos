@@ -89,7 +89,10 @@ function drawNode(node, color) {//4) dibujar nodos
 }
 
 function deleteNode() {//5) borrar nodos y sus aristas
-  const deleteNode = parseInt(document.getElementById('editNode').value);
+  let deleteNode = parseInt(document.getElementById('editNode').value);
+  if(!deleteNode){deleteNode = document.getElementById('editNode').value;}
+
+
   nodes = nodes.filter((node) => node.name !== deleteNode);
   edges = edges.filter((edge) => edge.start !== deleteNode && edge.end !== deleteNode);
   drawNodes();
@@ -482,7 +485,7 @@ function findShortestPath() {// Función para encontrar el camino más corto ent
   return shortestPath;
 }
 
-function Ejecucion() {// Uso de la función 
+function EjecucionDijkstra() {// Uso de la función 
 
 
 
@@ -524,7 +527,7 @@ function Ejecucion() {// Uso de la función
   }
 
 
-  
+
   time(endTime - startTime);
 
 }
@@ -644,3 +647,66 @@ function time(duration) {//imprecion del tiempo de ejecucion
 
 
 }
+
+//Controoladores de botones
+let listElements = document.querySelectorAll('.list__button--click');
+listElements.forEach(listElement => {
+  listElement.addEventListener('click', () => {
+
+    listElement.classList.toggle('arrow');
+
+    let height = 0;
+
+    let menu = listElement.nextElementSibling;
+    if (menu.clientHeight == "0") {
+      height = menu.scrollHeight;
+    }
+
+    menu.style.height = `${height}px`;
+
+
+  })
+})
+
+let elements = document.querySelectorAll('.Abrir, .New, .GuardarA, .GuardarImg, .Borrar, .Agregar, .AgregarArista, .CambiarValor, .EliminarArista, .Dijkstra, .Fulkerson');
+elements.forEach(element => {
+  element.addEventListener('click', () => {
+
+    const clickedClass = element.classList[2];
+    console.log(clickedClass)
+
+    switch (clickedClass) {
+      //__________________________________________BOTONES DE ARCHIVOS______________________________________
+
+      case 'Abrir': openProject(); break;//boton abrir archivo
+
+      case 'New': newProject(); break;//boton nuevo archivo
+
+      case 'GuardarA': saveProject(); break;//boton guardar archivo
+
+      case 'GuardarImg': saveImg(); break;//boton guardar como imagen
+
+      //__________________________________________BOTONES DE NODOS______________________________________
+
+      case 'Borrar': deleteNode(); break;//boton borrar nodos
+
+      case 'Agregar': alert('Doble clik en el panel para agregar nodo'); break;//boton Agregar nodos
+
+      //__________________________________________BOTONES DE ARISTAS______________________________________
+
+      case 'AgregarArista': addEdge(); break;//boton Agregar Arista
+
+      case 'CambiarValor': changeEdgeValue(); break;//boton cambiar valor de aritas
+
+      case 'EliminarArista': deleteEdge(); break;//boton eliminar arista
+
+      //__________________________________________BOTONES DE OPERACIONES______________________________________
+
+      case 'Dijkstra': EjecucionDijkstra(); break;//boton camino mas corto
+
+      case 'Fulkerson': EjecucionFulkerson(); break;//flujo maximo
+
+      default: break;
+    }
+  });
+});
