@@ -1,3 +1,10 @@
+/*
+Camilo andres de la puente romero: 0221920013
+Ronaldo jimenez guerrero: 0221920028
+Brayhan David herazo: 0222010021
+
+*/
+
 const canvas = document.getElementById('canvas');  // manipulacion del lienzo
 const ctx = canvas.getContext('2d');              // se utiliza para realizar operaciones de dibujo
 
@@ -40,19 +47,9 @@ function addNode(x, y) {//2) agregar nodo
     node.color = '#1900ff';
     nodeCounter--;
 
-  } else {
-    const x = nodes[1].x;
-    const y = nodes[1].y;
-
-    nodes[1].x = node.x;
-    nodes[1].y = node.y;
-
-    node.x = x;
-    node.y = y;
-
-    drawNodes()
-
   }
+
+  
   nodes.push(node);
 
 
@@ -106,6 +103,37 @@ function deleteNode() {//5) borrar nodos y sus aristas
     cEracer++;
   }
   lost.sort(function (a, b) { return a - b; });
+}
+
+function ChangeNodeFinal() {//Cambiar al nodo final
+  let ChangeNode = parseInt(document.getElementById('editNode').value);
+  if(!ChangeNode){ChangeNode = document.getElementById('editNode').value;}
+
+  let selectedNode = nodes.find((node) => node.name === ChangeNode);
+
+
+  if(selectedNode.name==="F" ){
+
+    alert("El nodo selecionado ya es el nodo final")
+  
+
+  }else if(selectedNode.name==="I"){
+
+    alert("El nodo selecionado es el nodo inicial")
+
+  }else{
+     // Intercambiar valores con el nodo final en la posición nodes[1]
+  let tempX = selectedNode.x;
+  let tempY = selectedNode.y;
+
+  selectedNode.x = nodes[1].x;
+  selectedNode.y = nodes[1].y;
+
+  nodes[1].x = tempX;
+  nodes[1].y = tempY;
+
+  drawNodes();
+  }
 }
 
 function addEdge() {//7) agregar aristas
@@ -668,7 +696,7 @@ listElements.forEach(listElement => {
   })
 })
 
-let elements = document.querySelectorAll('.Abrir, .New, .GuardarA, .GuardarImg, .Borrar, .Agregar, .AgregarArista, .CambiarValor, .EliminarArista, .Dijkstra, .Fulkerson');
+let elements = document.querySelectorAll('.Abrir, .New, .GuardarA, .GuardarImg, .Borrar, .Agregar, .AgregarArista, .CambiarValor, .EliminarArista, .Dijkstra, .Fulkerson, .CambiarF');
 elements.forEach(element => {
   element.addEventListener('click', () => {
 
@@ -691,6 +719,8 @@ elements.forEach(element => {
       case 'Borrar': deleteNode(); break;//boton borrar nodos
 
       case 'Agregar': alert('Doble clik en el panel para agregar nodo'); break;//boton Agregar nodos
+
+      case 'CambiarF':ChangeNodeFinal();break;//boton para cambair a nodo final
 
       //__________________________________________BOTONES DE ARISTAS______________________________________
 
