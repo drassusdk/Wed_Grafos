@@ -34,7 +34,7 @@ canvas.addEventListener('dblclick', function (event) {//1) tomar las cordenadas 
 });
 
 function addNode(x, y) {//2) agregar nodo
-  const node = { name: nodeCounter, x: x, y: y, color: '#ffcc00', type: "normal" };
+  let node = { name: nodeCounter, x: x, y: y, color: '#ffcc00', type: "normal" };
 
 
 
@@ -49,17 +49,38 @@ function addNode(x, y) {//2) agregar nodo
 
   }
 
-  
-  nodes.push(node);
-
-
   if (cEracer > 0 && cRename < cEracer) {//heredado de nombres
     node.name = lost[cRename];
     lost[cRename] = 0;
     cRename++;
+  
+    if (node.name === "I") {
+      node.type = "Inicial";
+      node.color = '#1900ff';
+  
+      // Intercambiar con el nodo en la posición 0
+      let tempNode = nodes[0];
+      nodes[0] = node;
+      node = tempNode;
+
+      drawNodes();
+    } else if (node.name === "F") {
+      node.type = "Final";
+      node.color = '#1900ff';
+  
+      // Intercambiar con el nodo en la posición 1
+      let tempNode = nodes[1];
+      nodes[1] = node;
+      node = tempNode;
+      drawNodes();
+    }
+
+    
   } else {
     nodeCounter++;
   }
+  
+  nodes.push(node);
 
   drawNode(node, node.color);
   updateSelects();
@@ -444,6 +465,7 @@ canvas.addEventListener('mouseup', function () {//evento que escucha donde se fi
 //___________________________________________________________________________________________________________________________________
 
 function dijkstra(startNodeName) {//algotimo de distrak
+ 
   const distances = {};
   const visited = {};
   const queue = [];
@@ -481,19 +503,20 @@ function dijkstra(startNodeName) {//algotimo de distrak
   return distances;
 }
 
-function VerificarType(type) {// Función para encontrar el nodo según su tipo
-  return nodes.find(node => node.type === type);
-}
-
 function findShortestPath() {// Función para encontrar el camino más corto entre el nodo inicial y final
 
   startTime = performance.now();//inicio del cronometro
 
-  const startNode = VerificarType("Inicial");
-  const endNode = VerificarType("Final");
+  const startNode = nodes[0];
+  const endNode = nodes[1];
 
   // Función dijkstra implementada anteriormente
   const distances = dijkstra(startNode.name);
+
+  if (distances[endNode.name] === Infinity) {
+    alert('No hay un camino válido desde el nodo inicial al nodo final.');
+    return null; // Devolver null para indicar que no se encontró un camino
+  }
 
   // Reconstruir el camino más corto
   let currentNode = endNode;
@@ -514,10 +537,19 @@ function findShortestPath() {// Función para encontrar el camino más corto ent
 }
 
 function EjecucionDijkstra() {// Uso de la función 
-
+  if (!Verificacion()) {
+    alert('El grafo no es válido para la operación.');
+    return;
+  }
 
 
   const camino = findShortestPath();
+
+    // Verificar si no se encontró un camino
+    if (camino === null) {
+      return;
+    }
+  
   console.log("Camino más corto:", camino);
 
   for (let x = 0; x < nodes.length; x++) {//cambio de color de los nodos
@@ -562,10 +594,9 @@ function EjecucionDijkstra() {// Uso de la función
 
 //_______________________________________________________________________________________________________________________________
 
-function fordFulkerson(graph, Inicio, Final) {// Implementación del algoritmo de Ford-Fulkerson
-
-  startTime = performance.now();//inicio del cronometro
-
+function fordFulkerson(graph, Inicio, Final) {//Algoritmo ford Fulkerson
+ 
+  startTime = performance.now();
   let flujoMaximo = 0;
 
   function encontrarFlujo(grafico, Inicio, Final, padre) {
@@ -575,11 +606,11 @@ function fordFulkerson(graph, Inicio, Final) {// Implementación del algoritmo d
       visitados.add(actual);
 
       for (const vecino in grafico[actual]) {
-        if (!visitados.has(vecino) && grafico[actual][vecino] > 0) {
+        if (!visitados.has(vecino) && grafico[actual][vecino].capacity > 0) {
           padre[vecino] = actual;
 
           if (vecino === Final) {
-            return true;  // Se encontró un camino aumentante
+            return true;
           }
 
           if (dfs(vecino)) {
@@ -599,23 +630,20 @@ function fordFulkerson(graph, Inicio, Final) {// Implementación del algoritmo d
     padre[nodo] = null;
   });
 
-
   while (encontrarFlujo(graph, Inicio, Final, padre)) {
     let flujoCamino = Infinity;
 
+    for (let v = Final; v !== Inicio; v = padre[v]) {
+      const u = padre[v];
+      flujoCamino = Math.min(flujoCamino, graph[u][v].capacity);
+    }
 
     for (let v = Final; v !== Inicio; v = padre[v]) {
       const u = padre[v];
-      flujoCamino = Math.min(flujoCamino, graph[u][v]);
+      graph[u][v].capacity -= flujoCamino;
+      graph[v][u].capacity += flujoCamino;
+      graph[u][v].used = true;
     }
-
-
-    for (let v = Final; v !== Inicio; v = padre[v]) {
-      const u = padre[v];
-      graph[u][v] -= flujoCamino;
-      graph[v][u] += flujoCamino;
-    }
-
 
     flujoMaximo += flujoCamino;
 
@@ -624,27 +652,79 @@ function fordFulkerson(graph, Inicio, Final) {// Implementación del algoritmo d
     });
   }
 
-  endTime = performance.now();//final del cronometro
-
+  endTime = performance.now();
   return flujoMaximo;
 }
 
-function EjecucionFulkerson() {// Uso de la función fordFulkerson
+function Camino(graph) {//Busca las aristas que conforman el camino del flujo maximo
+  const aristasFlujoMaximo = [];
+
+  edges.forEach((edge) => {
+    const { start, end } = edge;
+    if (graph[start][end].used) {
+      aristasFlujoMaximo.push(edge);
+    }
+  });
+
+  return aristasFlujoMaximo;
+}
+
+function EjecucionFulkerson() {//ejecucion del Algoritmo ford Fulkerson
+  if (!Verificacion()) {
+    alert('El grafo no es válido para la operación.');
+    return;
+  }
 
   const sourceNode = 'I';
   const sinkNode = 'F';
 
+  const graph = {};  
   nodes.forEach((node) => {
     graph[node.name] = {};
   });
   edges.forEach((edge) => {
     const { start, end, value } = edge;
-    graph[start][end] = value;
-    graph[end][start] = value;
+    graph[start][end] = { capacity: value, used: false };
+    graph[end][start] = { capacity: value, used: false };
   });
 
   const maxFlow = fordFulkerson(graph, sourceNode, sinkNode);
   console.log("Flujo Máximo:", maxFlow);
+
+  const aristas = Camino(graph);
+
+  // Cambiar color de las aristas
+  for (let x = 0; x < edges.length; x++) {
+    const esAristaEnFlujoMaximo = aristas.some(arista => 
+      edges[x].start === arista.start && edges[x].end === arista.end
+    );
+  
+    if (esAristaEnFlujoMaximo) {
+      edges[x].color = '#000000';  
+    } else {
+      edges[x].color = '#a1a1a3';  
+    }
+  }
+  
+  // Cambiar color de los nodos
+  for (let x = 0; x < nodes.length; x++) {
+    const esNodoEnFlujoMaximo = aristas.some(arista => 
+      nodes[x].name === arista.start || nodes[x].name === arista.end
+    );
+  
+    if (esNodoEnFlujoMaximo) {
+
+      if(nodes[x].type!='normal'){
+        nodes[x].color ='#0000ff';
+      }else{
+        nodes[x].color ='#ffcc00';
+      }
+      
+    } else {
+      nodes[x].color = '#676769';  
+    }
+  }
+  
 
   time(endTime - startTime);
 
@@ -653,9 +733,9 @@ function EjecucionFulkerson() {// Uso de la función fordFulkerson
   ctx.fillStyle = 'black';
 
   ctx.fillText(frase, 700, 580);
-
-
 }
+
+
 
 function time(duration) {//imprecion del tiempo de ejecucion
 
@@ -674,6 +754,28 @@ function time(duration) {//imprecion del tiempo de ejecucion
   endTime = 0;
 
 
+}
+
+function Verificacion() {//verifica si hay un grafo valido
+ 
+  if (nodes.length === 0 || edges.length === 0) {
+    return false;
+  }
+
+ 
+  const nodoInicial = nodes.find(node => node.type === 'Inicial');
+  if (nodoInicial && !edges.some(edge => edge.start === nodoInicial.name)) {
+    return false;
+  }
+
+  
+  const nodoFinal = nodes.find(node => node.type === 'Final');
+  if (nodoFinal && !edges.some(edge => edge.end === nodoFinal.name)) {
+    return false;
+  }
+
+ 
+  return true;
 }
 
 //Controoladores de botones
@@ -740,3 +842,6 @@ elements.forEach(element => {
     }
   });
 });
+
+
+
