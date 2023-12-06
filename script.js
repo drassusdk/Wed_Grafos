@@ -764,15 +764,22 @@ function Verificacion() {//verifica si hay un grafo valido
 
  
   const nodoInicial = nodes.find(node => node.type === 'Inicial');
+  
+  if(!nodoInicial){
+    return false;
+  }
+
   if (nodoInicial && !edges.some(edge => edge.start === nodoInicial.name)) {
     return false;
   }
 
   
   const nodoFinal = nodes.find(node => node.type === 'Final');
+
   if(!nodoFinal){
     return false;
   }
+
   if (nodoFinal && !edges.some(edge => edge.end === nodoFinal.name)) {
     return false;
   }
