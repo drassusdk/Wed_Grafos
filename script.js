@@ -770,6 +770,9 @@ function Verificacion() {//verifica si hay un grafo valido
 
   
   const nodoFinal = nodes.find(node => node.type === 'Final');
+  if(!nodoFinal){
+    return false;
+  }
   if (nodoFinal && !edges.some(edge => edge.end === nodoFinal.name)) {
     return false;
   }
