@@ -23,6 +23,12 @@ let offsetX, offsetY;
 let startTime;
 let endTime;
 
+// Contadores de nodo iniciale y final
+let nodosFinales = 0;
+let nodosIniciale = 0;
+let counter;
+
+
 
 const graph = {};//representar la estructura del grafo
 
@@ -41,11 +47,12 @@ function addNode(x, y) {//2) agregar nodo
   if (nodes.length <= 1) {
 
 
-    if (nodes.length === 0) { node.name = "I"; node.type = "Inicial" }
-    else { node.name = "F"; node.type = "Final" }
+    if (nodes.length === 0) { nodosIniciale++; node.name = "I" + nodosIniciale; node.type = "Inicial"; }
+    else { nodosFinales++; node.name = "F" + nodosFinales; node.type = "Final"; }
 
     node.color = '#1900ff';
     nodeCounter--;
+
 
   }
 
@@ -53,11 +60,11 @@ function addNode(x, y) {//2) agregar nodo
     node.name = lost[cRename];
     lost[cRename] = 0;
     cRename++;
-  
+
     if (node.name === "I") {
       node.type = "Inicial";
       node.color = '#1900ff';
-  
+
       // Intercambiar con el nodo en la posición 0
       let tempNode = nodes[0];
       nodes[0] = node;
@@ -67,7 +74,7 @@ function addNode(x, y) {//2) agregar nodo
     } else if (node.name === "F") {
       node.type = "Final";
       node.color = '#1900ff';
-  
+
       // Intercambiar con el nodo en la posición 1
       let tempNode = nodes[1];
       nodes[1] = node;
@@ -75,11 +82,11 @@ function addNode(x, y) {//2) agregar nodo
       drawNodes();
     }
 
-    
+
   } else {
     nodeCounter++;
   }
-  
+
   nodes.push(node);
 
   drawNode(node, node.color);
@@ -108,7 +115,7 @@ function drawNode(node, color) {//4) dibujar nodos
 
 function deleteNode() {//5) borrar nodos y sus aristas
   let deleteNode = parseInt(document.getElementById('editNode').value);
-  if(!deleteNode){deleteNode = document.getElementById('editNode').value;}
+  if (!deleteNode) { deleteNode = document.getElementById('editNode').value; }
 
 
   nodes = nodes.filter((node) => node.name !== deleteNode);
@@ -116,45 +123,122 @@ function deleteNode() {//5) borrar nodos y sus aristas
   drawNodes();
   updateSelects();
 
-  if (nodes.length == 0) {//guardado de difuntos
-    nodeCounter = 1;
-    cEracer = 0
-  } else {
-    lost[cEracer] = deleteNode;
-    cEracer++;
+  let controlador = true;
+
+  for (let x = nodosIniciale; x > 0; x--) {
+    if (deleteNode === "I" || deleteNode === "I" + x) { controlador = false; nodosIniciale--; }
   }
+  for (let x = nodosFinales; x > 0; x--) {
+    if (deleteNode === "F" || deleteNode === "F" + x) { controlador = false; nodosFinales--; }
+  }
+
+  if (controlador) {
+
+    if (nodes.length == 0) {//guardado de difuntos
+      nodeCounter = 1;
+      cEracer = 0
+    } else {
+      lost[cEracer] = deleteNode;
+      cEracer++;
+    }
+
+  }
+
+
   lost.sort(function (a, b) { return a - b; });
 }
 
-function ChangeNodeFinal() {//Cambiar al nodo final
+function ChangeNodeInicial() {//Cambiar al nodo Inicial
   let ChangeNode = parseInt(document.getElementById('editNode').value);
-  if(!ChangeNode){ChangeNode = document.getElementById('editNode').value;}
+  if (!ChangeNode) { ChangeNode = document.getElementById('editNode').value; }
 
   let selectedNode = nodes.find((node) => node.name === ChangeNode);
 
 
-  if(selectedNode.name==="F" ){
+  if (selectedNode.type === "Inicial") {
 
-    alert("El nodo selecionado ya es el nodo final")
-  
+    alert("El nodo selecionado ya es un nodo Inicial")
 
-  }else if(selectedNode.name==="I"){
+  } else {
 
-    alert("El nodo selecionado es el nodo inicial")
 
-  }else{
-     // Intercambiar valores con el nodo final en la posición nodes[1]
-  let tempX = selectedNode.x;
-  let tempY = selectedNode.y;
 
-  selectedNode.x = nodes[1].x;
-  selectedNode.y = nodes[1].y;
+    let name = selectedNode.name;
 
-  nodes[1].x = tempX;
-  nodes[1].y = tempY;
+    nodosIniciale++;
 
-  drawNodes();
+    nodeCounter--;
+
+    selectedNode.type = "Inicial";
+    selectedNode.name = "I" + nodosIniciale;
+    selectedNode.color = '#1900ff';
+
+    if (nodes.length == 0) {//guardado de difuntos
+      nodeCounter = 1;
+      cEracer = 0
+    } else {
+      lost[cEracer] = name;
+      cEracer++;
+      nodeCounter++;
+    }
+
+    for (let x = 0; x < edges.length; x++) {
+
+
+      if (edges[x].start === name) { edges[x].start = selectedNode.name }
+      else if (edges[x].end === name) { edges[x].end = selectedNode.name }
+    }
+
+
+
+    updateSelects();
+    drawNodes();
   }
+}
+
+function ChangeNodeFinal() {//Cambiar al nodo final
+  let ChangeNode = parseInt(document.getElementById('editNode').value);
+  if (!ChangeNode) { ChangeNode = document.getElementById('editNode').value; }
+
+  let selectedNode = nodes.find((node) => node.name === ChangeNode);
+
+
+  if (selectedNode.type === "Final") {
+
+    alert("El nodo selecionado ya es un nodo final")
+
+  } else {
+
+    let name = selectedNode.name;
+
+    nodosFinales++;
+    nodeCounter--;
+
+    selectedNode.type = "Final";
+    selectedNode.name = "F" + nodosFinales;
+    selectedNode.color = '#1900ff';
+
+    if (nodes.length == 0) {//guardado de difuntos
+      nodeCounter = 1;
+      cEracer = 0
+    } else {
+      lost[cEracer] = name;
+      cEracer++;
+
+      nodeCounter++;
+
+    }
+
+    for (let x = 0; x < edges.length; x++) {
+
+      if (edges[x].start === name) { edges[x].start = selectedNode.name }
+      else if (edges[x].end === name) { edges[x].end = selectedNode.name }
+    }
+
+    drawNodes();
+    updateSelects();
+  }
+
 }
 
 function addEdge() {//7) agregar aristas
@@ -238,8 +322,9 @@ function drawEdge(startX, startY, endX, endY, value, color) {//8)dibujar aristas
   const labelY = (startArrowY + endArrowY) / 2.09;
 
   ctx.font = '15px Arial';
-  ctx.fillStyle = '#000';
+  ctx.fillStyle = color;
   ctx.textAlign = 'center';
+
 
   if (value == 0) {
     ctx.font = '26px Arial';
@@ -388,6 +473,9 @@ function saveImg() {//15)  Guardar como imagen
 function openProject() {//16) abrir proyecto desde archivo JSON
   const input = document.createElement('input');
 
+  nodosFinales = 0;
+  nodosIniciale = 0;
+
   input.type = 'file';
   input.accept = 'application/json';
   input.click();
@@ -411,8 +499,15 @@ function openProject() {//16) abrir proyecto desde archivo JSON
 
       nodeCounter = max + 1;
 
+      for (let x = 0; x < nodes.length; x++) {
+        if (nodes[x].type === "Inicial") { nodosIniciale++; }
+        if (nodes[x].type === "Final") { nodosFinales++; }
+      }
+
+      //test()
       drawNodes();
       updateSelects();
+
     };
 
   };
@@ -465,7 +560,7 @@ canvas.addEventListener('mouseup', function () {//evento que escucha donde se fi
 //___________________________________________________________________________________________________________________________________
 
 function dijkstra(startNodeName) {//algotimo de distrak
- 
+
   const distances = {};
   const visited = {};
   const queue = [];
@@ -515,7 +610,7 @@ function findShortestPath() {// Función para encontrar el camino más corto ent
 
   if (distances[endNode.name] === Infinity) {
     alert('No hay un camino válido desde el nodo inicial al nodo final.');
-    return null; // Devolver null para indicar que no se encontró un camino
+    return null;
   }
 
   // Reconstruir el camino más corto
@@ -545,11 +640,11 @@ function EjecucionDijkstra() {// Uso de la función
 
   const camino = findShortestPath();
 
-    // Verificar si no se encontró un camino
-    if (camino === null) {
-      return;
-    }
-  
+  // Verificar si no se encontró un camino
+  if (camino === null) {
+    return;
+  }
+
   console.log("Camino más corto:", camino);
 
   for (let x = 0; x < nodes.length; x++) {//cambio de color de los nodos
@@ -595,7 +690,7 @@ function EjecucionDijkstra() {// Uso de la función
 //_______________________________________________________________________________________________________________________________
 
 function fordFulkerson(graph, Inicio, Final) {//Algoritmo ford Fulkerson
- 
+
   startTime = performance.now();
   let flujoMaximo = 0;
 
@@ -675,10 +770,44 @@ function EjecucionFulkerson() {//ejecucion del Algoritmo ford Fulkerson
     return;
   }
 
-  const sourceNode = 'I';
-  const sinkNode = 'F';
+  let sourceNode = 'I1';
+  let sinkNode = 'F1';
 
-  const graph = {};  
+
+  if (nodosIniciale > 1) {// si hay mas de un nodo inicial
+
+    const node = { name: "X", x: 50, y: 300, color: '#ff0000', type: "Origen" };
+    nodes.push(node);
+
+    for (let x = 0; x < nodes.length; x++) {
+
+      if (nodes[x].type === "Inicial") {
+        const edge = { start: "X", end: nodes[x].name, value: Infinity, color: '#000000' }
+        edges.push(edge);
+      }
+    }
+    sourceNode = "X";
+  }
+
+  if (nodosFinales > 1) {// si hay mas de un nodo Final
+
+    let node = { name: "Y", x: 900, y: 300, color: '#ff0000', type: "Destino" };
+    nodes.push(node);
+
+    for (let x = 0; x < nodes.length; x++) {
+      if (nodes[x].type === "Final") {
+    
+        const edge = { start: nodes[x].name, end: "Y", value: Infinity, color: '#000000' }
+        edges.push(edge);
+
+      }
+    }
+
+    nodes[nodes.length-1].type="Final";
+    sinkNode="Y";
+  }
+
+  const graph = {};
   nodes.forEach((node) => {
     graph[node.name] = {};
   });
@@ -695,37 +824,37 @@ function EjecucionFulkerson() {//ejecucion del Algoritmo ford Fulkerson
 
   // Cambiar color de las aristas
   for (let x = 0; x < edges.length; x++) {
-    const esAristaEnFlujoMaximo = aristas.some(arista => 
+    const esAristaEnFlujoMaximo = aristas.some(arista =>
       edges[x].start === arista.start && edges[x].end === arista.end
     );
-  
+
     if (esAristaEnFlujoMaximo) {
-      edges[x].color = '#000000';  
+      edges[x].color = '#000000';
     } else {
-      edges[x].color = '#a1a1a3';  
+      edges[x].color = '#a1a1a3';
     }
   }
-  
+
   // Cambiar color de los nodos
   for (let x = 0; x < nodes.length; x++) {
-    const esNodoEnFlujoMaximo = aristas.some(arista => 
+    const esNodoEnFlujoMaximo = aristas.some(arista =>
       nodes[x].name === arista.start || nodes[x].name === arista.end
     );
-  
+
     if (esNodoEnFlujoMaximo) {
 
-      if(nodes[x].type!='normal'){
-        nodes[x].color ='#0000ff';
-      }else{
-        nodes[x].color ='#ffcc00';
+      if (nodes[x].type != 'normal') {
+        nodes[x].color = '#0000ff';
+      } else {
+        nodes[x].color = '#ffcc00';
       }
-      
+
     } else {
-      nodes[x].color = '#676769';  
+      nodes[x].color = '#676769';
     }
   }
-  
 
+  
   time(endTime - startTime);
 
   const frase = "Flujo Maximo: " + maxFlow;
@@ -757,15 +886,15 @@ function time(duration) {//imprecion del tiempo de ejecucion
 }
 
 function Verificacion() {//verifica si hay un grafo valido
- 
+
   if (nodes.length === 0 || edges.length === 0) {
     return false;
   }
 
- 
+
   const nodoInicial = nodes.find(node => node.type === 'Inicial');
-  
-  if(!nodoInicial){
+
+  if (!nodoInicial) {
     return false;
   }
 
@@ -773,10 +902,10 @@ function Verificacion() {//verifica si hay un grafo valido
     return false;
   }
 
-  
+
   const nodoFinal = nodes.find(node => node.type === 'Final');
 
-  if(!nodoFinal){
+  if (!nodoFinal) {
     return false;
   }
 
@@ -784,7 +913,7 @@ function Verificacion() {//verifica si hay un grafo valido
     return false;
   }
 
- 
+
   return true;
 }
 
@@ -808,12 +937,12 @@ listElements.forEach(listElement => {
   })
 })
 
-let elements = document.querySelectorAll('.Abrir, .New, .GuardarA, .GuardarImg, .Borrar, .Agregar, .AgregarArista, .CambiarValor, .EliminarArista, .Dijkstra, .Fulkerson, .CambiarF');
+let elements = document.querySelectorAll('.Abrir, .New, .GuardarA, .GuardarImg, .Borrar, .Agregar, .AgregarArista, .CambiarValor, .EliminarArista, .Dijkstra, .Fulkerson, .CambiarF, .CambiarO');
 elements.forEach(element => {
   element.addEventListener('click', () => {
 
     const clickedClass = element.classList[2];
-    console.log(clickedClass)
+
 
     switch (clickedClass) {
       //__________________________________________BOTONES DE ARCHIVOS______________________________________
@@ -832,7 +961,9 @@ elements.forEach(element => {
 
       case 'Agregar': alert('Doble clik en el panel para agregar nodo'); break;//boton Agregar nodos
 
-      case 'CambiarF':ChangeNodeFinal();break;//boton para cambair a nodo final
+      case 'CambiarF': ChangeNodeFinal(); break;//boton para cambair a nodo final
+
+      case 'CambiarO': ChangeNodeInicial(); break;//boton para cambair a nodo Inicial
 
       //__________________________________________BOTONES DE ARISTAS______________________________________
 
@@ -852,6 +983,10 @@ elements.forEach(element => {
     }
   });
 });
+
+
+
+
 
 
 
