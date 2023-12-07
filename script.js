@@ -822,6 +822,24 @@ function EjecucionFulkerson() {//ejecucion del Algoritmo ford Fulkerson
 
   const aristas = Camino(graph);
 
+  function eliminarNodosOrigenDestino() {
+    // Eliminar el nodo "X"
+    const indexNodoX = nodes.findIndex(node => node.name === "X");
+    if (indexNodoX !== -1) {
+        nodes.splice(indexNodoX, 1);
+    }
+  
+    // Eliminar el nodo "Y"
+    const indexNodoY = nodes.findIndex(node => node.name === "Y");
+    if (indexNodoY !== -1) {
+        nodes.splice(indexNodoY, 1);
+    }
+  
+    // Eliminar aristas conectadas a "X" y "Y"
+    edges = edges.filter(edge => edge.start !== "X" && edge.end !== "X" && edge.start !== "Y" && edge.end !== "Y");
+  }
+  eliminarNodosOrigenDestino()
+
   // Cambiar color de las aristas
   for (let x = 0; x < edges.length; x++) {
     const esAristaEnFlujoMaximo = aristas.some(arista =>
@@ -863,8 +881,6 @@ function EjecucionFulkerson() {//ejecucion del Algoritmo ford Fulkerson
 
   ctx.fillText(frase, 700, 580);
 }
-
-
 
 function time(duration) {//imprecion del tiempo de ejecucion
 
@@ -983,10 +999,3 @@ elements.forEach(element => {
     }
   });
 });
-
-
-
-
-
-
-
