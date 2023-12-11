@@ -636,6 +636,10 @@ function EjecucionDijkstra() {// Uso de la función
     alert('El grafo no es válido para la operación.');
     return;
   }
+  if (nodosFinales>1 || nodosIniciale>1) {
+    alert('El grafo debe ser unico origen, unico destino para realizar la operacion.');
+    return;
+  }
 
 
   const camino = findShortestPath();
